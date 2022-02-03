@@ -15,16 +15,16 @@
 
 <div class="container">
     <h1>
-        Create new Post
+        Edit Post ID: {{$post->id}}
     </h1>
-    <form action="{{route('admin.posts.store')}}" method="POST">
+    <form action="{{route('admin.posts.update', $post)}}" method="POST">
         @csrf
-
+        @method('PUT')
         <div class="form-group">
           <label for="title">Title</label>
           <input type="text" 
                 class="form-control @error('title') is-invalid @enderror" 
-                value="{{old('title')}}"
+                value="{{old('title',$post->title)}}"
                 id="title"  name="title" placeholder="...">
           @error('title')
               <p class="invalid-feedback">{{$message}}</p>
@@ -33,15 +33,16 @@
         <div class="form-group">
           <label for="content">Content</label>
           <textarea  class="form-control @error('content') is-invalid @enderror" 
-                id="content" name="content" placeholder="...">
-              {{old('content')}}
-          </textarea>
+                id="content" name="content" 
+                placeholder="...">{{old('content',$post->content)}}</textarea>
+              
+          
           @error('content')
               <p class="invalid-feedback">{{$message}}</p>
           @enderror
         </div>
         
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="submit" class="btn btn-primary">Edit</button>
       </form>
 </div>
 
@@ -49,5 +50,5 @@
 @endsection
 
 @section('title')
- | Create Post
+ | {{$post->title}}
 @endsection

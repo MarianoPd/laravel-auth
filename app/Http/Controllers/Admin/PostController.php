@@ -15,7 +15,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::orderBy('id','desc')->paginate(5);
         return view('admin.posts.index', compact('posts'));
     }
 
@@ -69,7 +69,7 @@ class PostController extends Controller
     {
         $post = Post::find($id);
         if($post){
-            return route('admin.posts.show',compact($post));
+            return view('admin.posts.show',compact('post'));
         }
         abort(404,'Post not foud');
     }
@@ -82,7 +82,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        //
+        $post = Post::find($id);
+        if($post){
+            return view('admin.posts.edit', compact('post'));
+        }
+        abort(404, 'The post you want to edit is not present');
     }
 
     /**
@@ -92,9 +96,28 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $request->validate(
+            [
+                'title'=>"required|max:255|min:2",
+                'content'=>"required",   
+            ],
+            [
+                'title.required'=> "You have to title your post",
+                'title.max' => "Title excedes :max characters",
+                'title.min' => "Title must be at least :min character long",
+
+                'content.required' => "You have to fill the content",
+            ]
+            );
+        $data = $request->all();
+        if($data['title'] != $post->title){
+            $data['slug'] = Post::generateSlug($data['title']);
+        }
+        
+        $post->update($data);
+        return redirect()->route('admin.posts.show',$post);
     }
 
     /**
@@ -103,8 +126,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index')->with('deleted',"This post has been deleted: $post->title ");
     }
 }

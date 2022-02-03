@@ -4,9 +4,14 @@
 
 
 <div class="container">
-    <h1>
-        Create new Post
-    </h1>
+    <div>
+        <h1>
+            {{$post->title}}
+        </h1>
+        <p>{{$post->content}}</p>
+    </div>
+    <button type="button" class="btn btn-primary"><a href="{{route('admin.posts.index')}}" class="text-white">Go back</a></button>
+    
     
 </div>
 
@@ -14,5 +19,5 @@
 @endsection
 
 @section('title')
- | Create Post
+ | {{$post->title}}
 @endsection
