@@ -26,7 +26,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.posts.create');
     }
 
     /**
@@ -37,7 +37,26 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(
+            [
+                'title'=>"required|max:255|min:2",
+                'content'=>"required",   
+            ],
+            [
+                'title.required'=> "You have to title your post",
+                'title.max' => "Title excedes :max characters",
+                'title.min' => "Title must be at least :min character long",
+
+                'content.required' => "You have to fill the content",
+            ]
+            );
+        $data = $request->all();
+        $data['slug'] = Post::generateSlug($data['title']);
+        $new_post = new Post();
+        $new_post->fill($data);
+        $new_post->save();
+        return redirect()->route('admin.posts.index');
+
     }
 
     /**
@@ -48,7 +67,11 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        //
+        $post = Post::find($id);
+        if($post){
+            return route('admin.posts.show',compact($post));
+        }
+        abort(404,'Post not foud');
     }
 
     /**
